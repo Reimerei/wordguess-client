@@ -24,13 +24,11 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
   override def receive = {
 
     case status: GameStatus => {
-//      println("\ncurrent state: " + status.letters.map{_.getOrElse('.')}.mkString)
       maxCount = Math.max(maxCount, status.gameId)
       gameStateActor ! new Guess(status.letters, status.gameId)
     }
 
     case nextTry: Char => {
-//      println("nextTry: " + nextTry)
       makeGuess(nextTry)
     }
 
@@ -41,7 +39,6 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
 
     case GameLost(status) => {
       val word = status.letters.map{_.getOrElse('.')}.mkString
-      println("Lost: " + word)
       requestGame()
     }
 
