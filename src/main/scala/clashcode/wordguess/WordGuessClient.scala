@@ -5,6 +5,7 @@ import akka.event.Logging
 import scala.collection.mutable
 
 import messages._
+import java.io.FileWriter
 
 class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor {
       
@@ -14,21 +15,47 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
   // until you know you are in one.
 
   // Main methods at your disposal:
-  // requestGame()
+  requestGame()
   // makeGuess('a')
-  
-  // Incoming messages from the server are handled here
+
+  val gameStateActor =  ActorSystem("gameState").actorOf(Props(classOf[WordGuessState]))
+  var maxCount  = 0
+
   override def receive = {
-    // When a game was accepted or after a guess was made
-    case status: GameStatus => {}
-    // When the game was won
-    case GameWon(status) => {}
-    // When the game was lost
-    case GameLost(status) => {}
+
+    case status: GameStatus => {
+//      println("\ncurrent state: " + status.letters.map{_.getOrElse('.')}.mkString)
+      maxCount = Math.max(maxCount, status.gameId)
+      gameStateActor ! new Guess(status.letters, status.gameId)
+    }
+
+    case nextTry: Char => {
+//      println("nextTry: " + nextTry)
+      makeGuess(nextTry)
+    }
+
+    case GameWon(status) => {
+      gameStateActor ! new Solution(status.letters, status.gameId)
+      requestGame()
+    }
+
+    case GameLost(status) => {
+      val word = status.letters.map{_.getOrElse('.')}.mkString
+      println("Lost: " + word)
+      requestGame()
+    }
+
+
     // If there are no more available games (rare, but could happen)
-    case NoAvailableGames() => {}
+    case NoAvailableGames() => {
+      println("moep")
+      requestGame()
+    }
     // If the client (you) made a guess although no game was requested (or is over)
-    case NotPlayingError() => {}
+    case NotPlayingError() => {
+      println("FAIL")
+      requestGame()
+    }
     // When an chat message arrives 
     case MsgToAll(msg) => {}
   }
