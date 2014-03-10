@@ -19,8 +19,9 @@ object Word {
 
   implicit val writes: Writes[Word] = Writes[Word] { word =>
     Json.obj("works" -> word.state.map{_.getOrElse(".")}.mkString) ++
-    Json.obj("notWorks" -> getLetters.diff(word.notTried :: word.state.filter(_.isDefined).map(_.get).toList).mkString)
-    }
+    Json.obj("notWorks" -> getLetters.diff(word.notTried :: word.state.filter(_.isDefined).map(_.get).toList).mkString) ++
+    Json.obj("id" -> word.id)
+  }
 }
 
 
