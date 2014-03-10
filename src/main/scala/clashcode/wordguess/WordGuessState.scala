@@ -2,7 +2,7 @@ package clashcode.wordguess
 
 import akka.actor.{ActorRef, Actor}
 import java.io.FileWriter
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsObject, Reads, Json, Writes}
 import clashcode.wordguess.messages.SendToAll
 
 /**
@@ -19,8 +19,18 @@ object Word {
 
   implicit val writes: Writes[Word] = Writes[Word] { word =>
     Json.obj("works" -> word.state.map{_.getOrElse(".")}.mkString) ++
-    Json.obj("notWorks" -> getLetters.diff(word.notTried :: word.state.filter(_.isDefined).map(_.get).toList).mkString) ++
-    Json.obj("id" -> word.id)
+    Json.obj("notWorks" -> getLetters.diff(word.notTried ++ word.state.filter(_.isDefined).map(_.get).toList).mkString) ++
+    Json.obj("id" -> word.id) ++
+    Json.obj("from" -> "reimerei")
+  }
+
+  def fromJson(js: JsObject):Word = {
+    val state : Seq[Option[Char]] = Seq.fill(50){None}
+    val notWorks: List[Char] = (js \ "notWorks").asOpt[String].getOrElse("").toList
+    val works: List[Char] = (js \ "works").asOpt[String].getOrElse("").toList
+    val notTried: List[Char] = works ++ getLetters.diff(notWorks)
+    val id: Int = (js \ "id").asOpt[Int].getOrElse(0)
+    new Word(state, notTried, id)
   }
 }
 
