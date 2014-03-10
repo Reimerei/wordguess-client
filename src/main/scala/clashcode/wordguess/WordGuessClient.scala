@@ -18,7 +18,7 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
   requestGame()
   // makeGuess('a')
 
-  val gameStateActor =  ActorSystem("gameState").actorOf(Props(classOf[WordGuessState]))
+  val gameStateActor = context.system.actorOf(Props(classOf[WordGuessState]))
   var maxCount  = 0
 
   override def receive = {
@@ -38,7 +38,8 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
     }
 
     case GameLost(status) => {
-      val word = status.letters.map{_.getOrElse('.')}.mkString
+
+      gameStateActor ! new GameLostMessage(status.gameId, gameServer)
       requestGame()
     }
 
@@ -54,7 +55,9 @@ class WordGuesserClient(playerName: String, gameServer: ActorRef) extends Actor 
       requestGame()
     }
     // When an chat message arrives 
-    case MsgToAll(msg) => {}
+    case MsgToAll(msg) => {
+      println(msg)
+    }
   }
 
   // Request a game from the server; start by doing this

@@ -10,13 +10,16 @@ version := "0.1.0"
 
 scalaVersion := "2.10.3"
 
+resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/"
+
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-cluster"    % "2.2.3",
-  "com.typesafe.akka" %% "akka-slf4j"      % "2.2.3",
-  "com.typesafe.akka" %% "akka-testkit"    % "2.2.3",
-  "ch.qos.logback"    %  "logback-classic" % "1.0.13",
-  "junit"             %  "junit"           % "4.11"   % "test",
-  "org.scalatest"     %% "scalatest"       % "2.0"    % "test"
+  "com.typesafe.akka" %% "akka-cluster" % "2.2.3",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.2.3",
+  "com.typesafe.akka" %% "akka-testkit" % "2.2.3",
+  "ch.qos.logback" % "logback-classic" % "1.0.13",
+  "com.typesafe.play" %% "play-json" % "2.2.2",
+  "junit" % "junit" % "4.11" % "test",
+  "org.scalatest" %% "scalatest" % "2.0" % "test"
 )
 
 // Use Java 7 (change to JavaSE16 if you don't have Java 7 installed)
